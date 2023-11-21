@@ -2,7 +2,9 @@ package com.example.task11
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log.d
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.task11.adapter.ImageAdapter
 import com.example.task11.data.Image
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setup() {
         adapterSetup()
+        searchViewSetup()
     }
 
     private fun adapterSetup() {
@@ -34,7 +37,25 @@ class MainActivity : AppCompatActivity() {
                 .addToBackStack(null)
                 .commit()
         }
-        adapter.differ.submitList(Image.getImageData())
+        adapter.submitList(Image.getImageData())
         binding.rvImages.adapter = adapter
+    }
+
+    private fun searchViewSetup() {
+        binding.svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Called when the user submits the query
+                d("onQueryTextSubmit", query ?: "empty")
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Called when the text in the search view changes
+                // You can use 'newText' to filter your data and update the adapter
+                d("onQueryTextChange", newText ?: "empty")
+                adapter.filter(newText.orEmpty())
+                return true
+            }
+        })
     }
 }

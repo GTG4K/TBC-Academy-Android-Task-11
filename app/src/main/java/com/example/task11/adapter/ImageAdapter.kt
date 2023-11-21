@@ -11,13 +11,18 @@ import com.example.task11.databinding.ImageItemBinding
 class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
     private var onImageClickListener: ((Image) -> Unit)? = null
-//
-//    fun filter(query: String) {
-//        val filteredList = differ.currentList.filter {
-//            it.title.contains(query, true) || it.description.contains(query, true)
-//        }
-//        differ.submitList(filteredList)
-//    }
+    private var originalList: List<Image> = emptyList()
+    fun submitList(images: List<Image>) {
+        originalList = images
+        differ.submitList(images)
+    }
+
+    fun filter(query: String) {
+        val filteredList = originalList.filter {
+            it.title.contains(query, true) || it.description.contains(query, true)
+        }
+        differ.submitList(filteredList)
+    }
 
     fun setOnImageClickListener(listener: (Image) -> Unit) {
         onImageClickListener = listener
@@ -45,7 +50,8 @@ class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
         holder.bind(differ.currentList[position])
     }
 
-    private val diffCallback = object : DiffUtil.ItemCallback<Image>() {
+    private inner class DiffCallback : DiffUtil.ItemCallback<Image>() {
+
         override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean {
             return oldItem.id == newItem.id
         }
@@ -55,5 +61,5 @@ class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
         }
     }
 
-    val differ = AsyncListDiffer(this, diffCallback)
+    val differ = AsyncListDiffer(this, DiffCallback())
 }
